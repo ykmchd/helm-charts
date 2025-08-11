@@ -4,7 +4,7 @@ replicaCount: 1
 nginx:
   image:
     repository: nginx
-    tag: "1.25"
+    tag: "1.29"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,7 +20,7 @@ nginx:
 vector:
   image:
     repository: timberio/vector
-    tag: "0.34.0-alpine"
+    tag: "0.48.0-alpine"
     pullPolicy: IfNotPresent
   resources:
     limits:
