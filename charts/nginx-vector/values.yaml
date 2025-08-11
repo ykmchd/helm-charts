@@ -1,0 +1,66 @@
+# Default values for nginx-vector-chart.
+replicaCount: 1
+
+nginx:
+  image:
+    repository: nginx
+    tag: "1.25"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+vector:
+  image:
+    repository: timberio/vector
+    tag: "0.34.0-alpine"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  config:
+    sources:
+      nginx_logs:
+        type: file
+        include:
+          - /var/log/nginx/*.log
+        read_from: beginning
+    transforms:
+      parse_logs:
+        type: remap
+        inputs:
+          - nginx_logs
+        source: |
+          . = parse_nginx_log!(.message, "combined")
+          .timestamp = parse_timestamp(.timestamp, "%d/%b/%Y:%H:%M:%S %z") ?? now()
+    outputs:
+      stdout:
+        type: console
+        encoding:
+          codec: json
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "apache-vector-chart.fullname" . }}-vector-config
+  labels:
+    {{- include "apache-vector-chart.labels" . | nindent 4 }}
+data:
+  vector.yaml: |
+{{ include "vector-common.config" . | indent 4 }}

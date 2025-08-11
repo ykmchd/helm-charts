@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "apache-vector-chart.fullname" . }}
+  labels:
+    {{- include "apache-vector-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apache.service.type }}
+  ports:
+    - port: {{ .Values.apache.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "apache-vector-chart.selectorLabels" . | nindent 4 }}

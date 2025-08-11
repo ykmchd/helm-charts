@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nginx-vector-chart.fullname" . }}
+  labels:
+    {{- include "nginx-vector-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nginx-vector-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-vector-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: nginx
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+        imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          {{- toYaml .Values.nginx.resources | nindent 10 }}
+        volumeMounts:
+        - name: nginx-logs
+          mountPath: /var/log/nginx
+      - name: vector
+        image: "{{ .Values.vector.image.repository }}:{{ .Values.vector.image.tag }}"
+        imagePullPolicy: {{ .Values.vector.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.vector.resources | nindent 10 }}
+        volumeMounts:
+        - name: nginx-logs
+          mountPath: /var/log/nginx
+          readOnly: true
+        - name: vector-config
+          mountPath: /etc/vector
+          readOnly: true
+        command:
+        - vector
+        - --config
+        - /etc/vector/vector.yaml
+      volumes:
+      - name: nginx-logs
+        emptyDir: {}
+      - name: vector-config
+        configMap:
+          name: {{ include "nginx-vector-chart.fullname" . }}-vector-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
