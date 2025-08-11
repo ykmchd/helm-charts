@@ -1,0 +1,68 @@
+apiVersion: v1
+entries:
+  apache-vector:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-08-11T14:24:19.448574909Z"
+    dependencies:
+    - name: vector-common
+      repository: file://../vector-common
+      version: 0.1.0
+    description: A Helm chart for Apache HTTPd with Vector sidecar for log collection
+    digest: 7f685bdb9dce93bcf5797cc2c459f42764e6dfebe00bdbffe611c9ff795b2b01
+    keywords:
+    - apache
+    - httpd
+    - vector
+    - logging
+    - sidecar
+    maintainers:
+    - email: ykmchd@gmail.com
+      name: Chart Maintainer
+    name: apache-vector
+    type: application
+    urls:
+    - https://github.com/ykmchd/helm-charts/releases/download/apache-vector-0.1.0/apache-vector-0.1.0.tgz
+    version: 0.1.0
+  nginx-vector:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-08-11T14:24:19.597365232Z"
+    dependencies:
+    - name: vector-common
+      repository: file://../vector-common
+      version: 0.1.0
+    description: A Helm chart for Nginx with Vector sidecar for log collection
+    digest: 42de6c95c71422dafc81f54737b9c137e9c5f7abb8e6a25177c14992a7cf4282
+    keywords:
+    - nginx
+    - vector
+    - logging
+    - sidecar
+    maintainers:
+    - email: ykmchd@gmail.com
+      name: Chart Maintainer
+    name: nginx-vector
+    type: application
+    urls:
+    - https://github.com/ykmchd/helm-charts/releases/download/nginx-vector-0.1.0/nginx-vector-0.1.0.tgz
+    version: 0.1.0
+  vector-common:
+  - apiVersion: v2
+    created: "2025-08-11T14:24:19.778579055Z"
+    description: A Helm library chart for common Vector configurations
+    digest: a0fc3f56fcf6dc14f22a00c644eaaf1eb53f9c5ecf81dcfa1bf1256072d514d8
+    keywords:
+    - vector
+    - logging
+    - library
+    - common
+    maintainers:
+    - email: ykmchd@gmail.com
+      name: Chart Maintainer
+    name: vector-common
+    type: library
+    urls:
+    - https://github.com/ykmchd/helm-charts/releases/download/vector-common-0.1.0/vector-common-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-08-11T14:24:19.778584165Z"
