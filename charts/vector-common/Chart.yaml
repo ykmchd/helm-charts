@@ -1,0 +1,13 @@
+apiVersion: v2
+name: vector-common
+description: A Helm library chart for common Vector configurations
+type: library
+version: 0.1.0
+keywords:
+  - vector
+  - logging
+  - library
+  - common
+maintainers:
+  - name: Chart Maintainer
+    email: ykmchd@gmail.com

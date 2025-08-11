@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "apache-vector-chart.fullname" . }}
+  labels:
+    {{- include "apache-vector-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "apache-vector-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "apache-vector-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: apache
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        image: "{{ .Values.apache.image.repository }}:{{ .Values.apache.image.tag }}"
+        imagePullPolicy: {{ .Values.apache.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          {{- toYaml .Values.apache.resources | nindent 10 }}
+        volumeMounts:
+        - name: apache-logs
+          mountPath: /var/log/apache2
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Enable logging to files
+          mkdir -p /var/log/apache2
+          # Start Apache with custom logging configuration
+          exec httpd-foreground
+      - name: vector
+        image: "{{ .Values.vector.image.repository }}:{{ .Values.vector.image.tag }}"
+        imagePullPolicy: {{ .Values.vector.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.vector.resources | nindent 10 }}
+        volumeMounts:
+        - name: apache-logs
+          mountPath: /var/log/apache2
+          readOnly: true
+        - name: vector-config
+          mountPath: /etc/vector
+          readOnly: true
+        command:
+        - vector
+        - --config
+        - /etc/vector/vector.yaml
+      volumes:
+      - name: apache-logs
+        emptyDir: {}
+      - name: vector-config
+        configMap:
+          name: {{ include "apache-vector-chart.fullname" . }}-vector-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
